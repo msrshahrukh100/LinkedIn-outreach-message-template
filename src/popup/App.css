@@ -1,0 +1,124 @@
+.app {
+  width: 400px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  color: #0077b5;
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.template-help {
+  background-color: #e1f5fe;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.template-help p {
+  margin: 0;
+  color: #0288d1;
+  font-size: 14px;
+}
+
+.template-input {
+  margin-bottom: 20px;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+button {
+  background-color: #0077b5;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 8px;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #005582;
+}
+
+.template-item {
+  background-color: #f8f9fa;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.template-item p {
+  margin: 0;
+  flex: 1;
+  padding-right: 10px;
+  word-break: break-word;
+}
+
+.template-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.select-btn {
+  background-color: #2e7d32;
+}
+
+.select-btn:hover {
+  background-color: #1b5e20;
+}
+
+.select-btn.selected {
+  background-color: #1b5e20;
+  cursor: default;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.templates-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.templates-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.templates-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.templates-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.templates-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+} 
