@@ -111,25 +111,62 @@ function fillConnectionMessage(template) {
 // Function to observe the connect button click
 function observeConnectButton() {
   console.log('Starting to observe for connect button click');
+
+  // Function to handle connect button click
+  function handleConnectClick() {
+    console.log('Connect button clicked');
+    // Wait for the message box to appear
+    let attempts = 0;
+    const maxAttempts = 50;
+    
+    const checkForMessageBox = setInterval(() => {
+      attempts++;
+      const messageBox = findMessageBox();
+      
+      if (messageBox) {
+        clearInterval(checkForMessageBox);
+        console.log('Message box found after', attempts, 'attempts');
+        
+        chrome.storage.local.get(['selectedTemplate'], (result) => {
+          console.log('Retrieved selected template:', result.selectedTemplate);
+          if (result.selectedTemplate) {
+            fillConnectionMessage(result.selectedTemplate);
+          } else {
+            console.log('No template selected');
+          }
+        });
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkForMessageBox);
+        console.log('Gave up looking for message box after', maxAttempts, 'attempts');
+      }
+    }, 100); // Check every 100ms
+  }
+
+  // Function to set up connect button listeners
+  function setupConnectButtonListeners() {
+    // Look for any button that might be the connect button
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+      const ariaLabel = (button.getAttribute('aria-label') || '').toLowerCase();
+      const buttonText = (button.textContent || '').toLowerCase();
+      
+      if (ariaLabel.includes('connect') || buttonText.includes('connect')) {
+        console.log('Found connect button:', button);
+        // Remove existing listener if any and add new one
+        button.removeEventListener('click', handleConnectClick);
+        button.addEventListener('click', handleConnectClick);
+      }
+    });
+  }
+
+  // Initial setup
+  setupConnectButtonListeners();
+
+  // Watch for new buttons being added
   const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
       if (mutation.addedNodes.length) {
-        const messageBox = findMessageBox();
-        if (messageBox) {
-          console.log('Message box found in mutation observer');
-          // When message box is found, get template and fill
-          chrome.storage.local.get(['selectedTemplate'], (result) => {
-            console.log('Retrieved selected template:', result.selectedTemplate);
-            if (result.selectedTemplate) {
-              fillConnectionMessage(result.selectedTemplate);
-            } else {
-              console.log('No template selected');
-            }
-          });
-          // Stop observing once we've found and filled the message box
-          observer.disconnect();
-          console.log('Disconnected observer');
-        }
+        setupConnectButtonListeners();
       }
     }
   });
@@ -141,19 +178,67 @@ function observeConnectButton() {
   console.log('Observer started');
 }
 
+// Function to check if we're on a profile page
+function isProfilePage() {
+  return window.location.href.includes('linkedin.com/in/');
+}
+
 // Function to initialize the extension
 function initializeExtension() {
-  console.log('Initializing extension');
-  observeConnectButton();
+  console.log('Initializing extension on:', window.location.href);
+  if (isProfilePage()) {
+    observeConnectButton();
+  }
+}
+
+// Function to handle URL changes
+function setupURLChangeListener() {
+  console.log('Setting up URL change listener');
+  
+  // Last known URL
+  let lastUrl = window.location.href;
+  
+  // Create an observer instance to watch for URL changes
+  const observer = new MutationObserver(() => {
+    const currentUrl = window.location.href;
+    if (currentUrl !== lastUrl) {
+      console.log('URL changed from', lastUrl, 'to', currentUrl);
+      lastUrl = currentUrl;
+      
+      // If we're on a profile page, reinitialize
+      if (isProfilePage()) {
+        console.log('New page is a profile, reinitializing...');
+        initializeExtension();
+      }
+    }
+  });
+
+  // Start observing the document with the configured parameters
+  observer.observe(document, {
+    subtree: true,
+    childList: true
+  });
+
+  // Also listen for popstate events (browser back/forward)
+  window.addEventListener('popstate', () => {
+    console.log('Navigation detected (popstate)');
+    if (isProfilePage()) {
+      initializeExtension();
+    }
+  });
 }
 
 // Start the extension
 console.log('Content script loaded');
 // Wait for the page to be fully loaded
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeExtension);
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeExtension();
+    setupURLChangeListener();
+  });
 } else {
   initializeExtension();
+  setupURLChangeListener();
 }
 
 // Listen for messages from popup or background script
