@@ -10,7 +10,9 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "webNavigation",
+    "tabs"
   ],
   "host_permissions": [
     "https://*.linkedin.com/*"
